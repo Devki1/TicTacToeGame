@@ -23,3 +23,12 @@ case $checkLetter in
 			echo "you assigned:"$X
 			;;
 esac
+checkToss=$((RANDOM%2))
+case $checkToss in
+		0)
+			echo "play first:"
+			;;
+		1)
+			echo "play second"
+			;;
+esac

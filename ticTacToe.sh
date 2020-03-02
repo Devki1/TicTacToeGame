@@ -2,8 +2,10 @@
 declare -a board
 echo "Welcome to Tic Tac Toe Game"
 board=(" " " " " " " " " " " " " " " " " ")
-O="0"
-X="X"
+Dot=0
+cross=1
+User=0
+Computer=1
 function resultingboard()
 {
 	echo "${board[0]} | ${board[1]} | ${board[2]}"
@@ -12,23 +14,52 @@ function resultingboard()
 	echo "----------"
 	echo "${board[6]} | ${board[7]} | ${board[8]}"
 }
-#Call the function 
+#Choose a valid cell
+function playerTurn()
+{
+	playerLetter=$1
+	echo "Enter a valid cell data from 0 to 8:" data
+	read data
+	if(($data>0 && $data<8))
+	then
+		if [[ "${board[data]}"!=X || "${board[data]}"!=O ]]
+		then
+			board[$data]="$playerLetter"
+		else
+			valid $playerLetter 
+		fi
+	fi
 resultingboard
-checkLetter=$((RANDOM%2))
-case $checkLetter in
-		0)
-			echo "you assigned:"$O
+}
+#This function is used to get a letter O or X
+function getLetter()
+{
+	checkLetter=$((RANDOM%2))
+	case $checkLetter in
+		$Dot)
+			playerLetter="O"
 			;;
-		1)
-			echo "you assigned:"$X
+		$cross)
+			playerLetter="X"
 			;;
-esac
-checkToss=$((RANDOM%2))
-case $checkToss in
-		0)
-			echo "play first:"
+	esac
+	echo $playerLetter
+}
+#This function is used to check is who play first
+function whoPlayFirst()
+{
+	playerChance=$((RANDOM%2))
+	case $playerChance in
+		$User)
+			echo "User chance play first: "
 			;;
-		1)
-			echo "play second"
+		$Computer)
+			echo "computer chance play first:"
 			;;
-esac
+	esac
+}
+letter="$(getLetter)"
+#call the function
+whoPlayFirst
+playerTurn $letter
+

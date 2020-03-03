@@ -6,6 +6,7 @@ DOT=0
 CROSS=1
 USER=0
 COMPUTER=1
+IS_EMPTY=" "
 function resultingBoard()
 {
 	echo "${board[0]} | ${board[1]} | ${board[2]}"
@@ -77,21 +78,6 @@ function checkWin()
 	fi
 	echo $result
 }
-#Computer play turn
-function computerTurn()
-{
-	computerLetter=$1
-
-	data=$((RANDOM%9))
-	if [ "${board[$data]}" != "X" ] && [ "${board[$data]}" != "O" ]
-	then
-		echo "Computer turn"
-		board[$data]="$computerLetter"
-		resultingBoard
-	else
-		computerTurn $computerLetter
-	fi
-}
 #Assigned a letter
 function getLetter()
 {
@@ -100,13 +86,13 @@ function getLetter()
 		$DOT)
 			playerLetter="O"
 			computerLetter="X"
-		;;
+			;;
 		$CROSS)
 			playerLetter="X"
 			computerLetter="O"
-		;;
+			;;
 	esac
-	#echo "Player: $playerLetter Computer: $computerLetter"
+#echo "Player: $playerLetter Computer: $computerLetter"
 }
 #Player chance
 function whoPlayFirst()
@@ -114,41 +100,147 @@ function whoPlayFirst()
 	playerChance=$((RANDOM%2))
 	case $playerChance in
 		$USER)
-			 echo "User"
-		;;
+			echo "User"
+			;;
 		$COMPUTER)
-			 echo "Computer"
-		;;
+			echo "Computer"
+			;;
 	esac
+}
+function checkWiningMove()
+{
+	local letter=$1
+	index=0
+	#Checking for rows
+	while(($index<8))
+	do
+		if [[ ${display[$index]} == $letter && ${display[$((index+1))]} == $letter && ${display[$((index+2))]} == $IS_EMPTY ]]
+		then
+			board[$((index+2))]=$letter
+			play=1
+		return
+		elif [[ ${display[$index]} == $letter && ${display[$((index+2))]} == $letter && ${display[$((index+1))]} == $IS_EMPTY ]]
+		then
+			board[$((index+1))]=$letter
+			play=1
+		return
+		elif [[ ${display[$((index+2))]} == $letter && ${display[$((index+1))]} == $letter && ${display[$index]} == $IS_EMPTY ]]
+		then
+			board[$index]=$letter
+			play=1
+		return
+		fi
+		index=$((index+3))
+	done
+	index=0
+	#Checking for columns
+	while(($index<8))
+	do
+		if [[ ${board[$index]} == $letter && ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $IS_EMPTY ]]
+		then
+			board[$((index+6))]=$letter
+			play=1
+		return
+		elif [[ ${board[$index]} == $letter && ${board[$((index+6))]} == $letter && ${board[$((index+3))]} == $IS_EMPTY ]]
+		then
+			board[$((index+3))]=$letter
+			play=1
+		return
+		elif [[ ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
+		then
+			board[$index]=$letter
+			play=1
+		return
+		fi
+		index=$((index+1))
+	done
+	#Checking for primary diagonal
+	if [[ ${board[0]} == $letter && ${board[4]} == $letter && ${board[8]} == $IS_EMPTY ]]
+	then
+		board[8]=$letter
+		play=1
+	return
+	elif [[ ${board[0]} == $letter && ${board[8]} == $letter && ${board[4]} == $IS_EMPTY ]]
+	then
+		board[4]=$letter
+		play=1
+	return
+	elif [[ ${board[8]} == $letter && ${board[4]} == $letter && ${board[0]} == $IS_EMPTY ]]
+	then
+		board[0]=$letter
+		play=1
+	return
+	fi
+	#Checking for secondary diagonal
+	if [[ ${board[2]} == $letter && ${board[4]} == $letter && ${board[6]} == $IS_EMPTY ]]
+	then
+		board[6]=$letter
+		play=1
+	return
+	elif [[ ${board[2]} == $letter && ${board[6]} == $letter && ${board[4]} == $IS_EMPTY ]]
+	then
+		board[4]=$letter
+		play=1
+	return
+	elif [[ ${board[6]} == $letter && ${board[4]} == $letter && ${board[2]} == $IS_EMPTY ]]
+	then
+		board[2]=$letter
+		play=1
+	return
+	fi
+}
+#Computer win randomly play on its turn
+function computerTurn()
+{
+	computerLetter=$1
+	play=0
+	checkWiningMove $computerLetter
+	if(($play==0))
+	then
+	data=$((RANDOM%9))
+	#if no value is assign to index then go ahead else return function
+   if [ "${board[$data]}" != X ] && [ "${board[$data]}" != O ]
+	then
+		echo "Computer turn: "
+		board[$data]="$computerLetter"
+		else
+			computerTurn $computerLetter
+	fi
+	fi
+	resultingBoard
+}
+function alternatePlay()
+{
+	chance="$(whoPlayFirst)"
+	flag=0
+	if [ "$chance" = "computerChance" ]
+	then
+		flag=1
+	fi
+	while ((0==0 ))
+	do
+		if(( flag%2!=0 ))
+		then
+			computerTurn $computerLetter
+			result=$(checkWin $computerLetter)
+		if [[ $result = "win" ]] || [[ $result = "draw" ]]
+		then
+			printf " Computer $result\n"
+ 	        break 
+		fi
+		else
+			playerTurn $playerLetter
+			result="$(checkWin $playerLetter)"
+		if [[ $result = "win" ]] || [[ $result = "draw" ]]
+		then
+			printf " Player $result\n"
+				break 
+		fi
+		fi
+		flag=$((flag+1))
+	done
 }
 resultingBoard
 getLetter
-chance="$(whoPlayFirst)"
-#checkWin $playerLetter
-flag=0
-if [ $chance == "Computer" ]
-then
-	flag=1
-fi
-while((0==0))
-do
-	if (( $flag%2==0 ))
-	then
-		computerTurn $computerLetter
-		result="$(checkWin $computerLetter)"
-		if [[ $result == "win" || $result == "draw" ]]
-		then
-			printf "Computer $result\n"
-			break
-		fi
-	else
-		playerTurn $playerLetter
-		result="$(checkWin $playerLetter)"
-		if [[ $result == "win" || $result == "draw" ]]
-		then
-			printf "Player $result\n"
-			break
-		fi
-	fi
-	flag=$((flag+1))
-done
+alternatePlay
+

@@ -57,6 +57,9 @@ function checkWin()
 	elif [[ "${board[2]} ${board[5]} ${board[8]}" == "$letter $letter $letter" ]]
 	then
 		result="win"
+	 elif [[ "${board[0]} ${board[3]} ${board[6]}" == "$letter $letter $letter" ]]
+   then
+      result="win"
 	elif [[ "${board[0]} ${board[4]} ${board[8]}" == "$letter $letter $letter" ]]
 	then
 		result="win"
@@ -87,12 +90,12 @@ function getLetter()
 	checkLetter=$((RANDOM%2))
 	case $checkLetter in
 		$DOT)
-			playerLetter=O
-			computerLetter=X
+			playerLetter="O"
+			computerLetter="X"
 			;;
 		$CROSS)
-			playerLetter=X
-			computerLetter=O
+			playerLetter="X"
+			computerLetter="O"
 			;;
 	esac
 }
@@ -105,7 +108,7 @@ function whoPlayFirst()
 			echo "playerChance"
 			;;
 		$COMPUTER)
-			echo "ComputerChance"
+			echo "computerChance"
 			;;
 	esac
 }
@@ -119,17 +122,17 @@ function checkWiningMove()
 		if [[ ${board[$index]} == $letter && ${board[$((index+1))]} == $letter && ${board[$((index+2))]} == $IS_EMPTY ]]
 		then
 			board[$((index+2))]=$letter
-			play=1
+			Play=1
 		return
 		elif [[ ${board[$index]} == $letter && ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $IS_EMPTY ]]
 		then
 			board[$((index+1))]=$letter
-			play=1
+			Play=1
 		return
 		elif [[ ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
 		then
 			board[$index]=$letter
-			play=1
+			Play=1
 		return
 		fi
 		index=$((index+3))
@@ -141,17 +144,17 @@ function checkWiningMove()
 		if [[ ${board[$index]} == $letter && ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $IS_EMPTY ]]
 		then
 			board[$((index+6))]=$letter
-			play=1
+			Play=1
 		return
 		elif [[ ${board[$index]} == $letter && ${board[$((index+6))]} == $letter && ${board[$((index+3))]} == $IS_EMPTY ]]
 		then
 			board[$((index+3))]=$letter
-			play=1
+			Play=1
 		return
 		elif [[ ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
 		then
 			board[$index]=$letter
-			play=1
+			Play=1
 		return
 		fi
 		index=$((index+1))
@@ -160,40 +163,40 @@ function checkWiningMove()
 	if [[ ${board[0]} == $letter && ${board[4]} == $letter && ${board[8]} == $IS_EMPTY ]]
 	then
 		board[8]=$letter
-		play=1
+		Play=1
 	return
 	elif [[ ${board[0]} == $letter && ${board[8]} == $letter && ${board[4]} == $IS_EMPTY ]]
 	then
 		board[4]=$letter
-		play=1
+		Play=1
 	return
 	elif [[ ${board[8]} == $letter && ${board[4]} == $letter && ${board[0]} == $IS_EMPTY ]]
 	then
 		board[0]=$letter
-		play=1
+		Play=1
 	return
 	fi
 	#Checking for secondary diagonal
 	if [[ ${board[2]} == $letter && ${board[4]} == $letter && ${board[6]} == $IS_EMPTY ]]
 	then
 		board[6]=$letter
-		play=1
+		Play=1
 	return
 	elif [[ ${board[2]} == $letter && ${board[6]} == $letter && ${board[4]} == $IS_EMPTY ]]
 	then
 		board[4]=$letter
-		play=1
+		Play=1
 	return
 	elif [[ ${board[6]} == $letter && ${board[4]} == $letter && ${board[2]} == $IS_EMPTY ]]
 	then
 		board[2]=$letter
-		play=1
+		Play=1
 	return
 	fi
 }
 function blockPlayerWin()
 {
-	play=0
+	Play=0
 	letter=$1
 	computerLetter=$2
 	index=0
@@ -203,19 +206,20 @@ function blockPlayerWin()
 		if [[ ${board[$index]} == $letter && ${board[$((index+1))]} == $letter && ${board[$((index+2))]} == $IS_EMPTY ]]
 		then
 			board[$((index+2))]=$computerLetter
-			play=1
+			Play=1
 			return
 		elif [[ ${board[$index]} == $letter && ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $IS_EMPTY ]]
 		then
 			board[$((index+1))]=$computerLetter
-			play=1
+			Play=1
 			return
 		elif [[ ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
 		then
 			board[$index]=$computerLetter
-			playlay=1
+			Play=1
 			return
 		fi
+		index=$((index+3))
 	done
 		index=0
 		#Checking for columns
@@ -224,53 +228,53 @@ function blockPlayerWin()
 			if [[ ${board[$index]} == $letter && ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $IS_EMPTY ]]
 			then
 				board[$((index+6))]=$computerLetter
-				play=1
+				Play=1
 				return
 			elif [[ ${board[$index]} == $letter && ${board[$((index+6))]} == $letter && ${board[$((index+3))]} == $IS_EMPTY ]]
 			then
 				board[$((index+3))]=$computerLetter
-				play=1
+				Play=1
 			return
 			elif [[ ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
 			then
 				board[$index]=$computerLetter
-				play=1
+				Play=1
 			return
 			fi
-			index=$((index+3))
+			index=$((index+1))
 		done
    #Checking for primary diaganol
 	if [[ ${board[0]} == $letter && ${board[4]} == $letter && ${board[8]} == $IS_EMPTY ]]
 	then
 		board[8]=$computerLetter
-		play=1
+		Play=1
 		return
 	elif [[ ${board[0]} == $letter && ${board[8]} == $letter && ${board[4]} == $IS_EMPTY ]]
 	then
 		board[4]=$computerLetter
-		play=1
+		Play=1
 		return
 	elif [[ ${board[8]} == $letter && ${board[4]} == $letter && ${board[0]} == $IS_EMPTY ]]
 	then
 		board[0]=$computerLetter
-		play=1
+		Play=1
 		return
 	fi
 	#checking for secondary diagonal
 	if [[ ${board[2]} == $letter && ${board[4]} == $letter && ${board[6]} == $IS_EMPTY ]]
    then
       board[6]=$computerLetter
-      play=1
+      Play=1
       return
    elif [[ ${board[2]} == $letter && ${board[6]} == $letter && ${board[4]} == $IS_EMPTY ]]
    then
       board[4]=$computerLetter
-      play=1
+      Play=1
       return
    elif [[ ${board[6]} == $letter && ${board[4]} == $letter && ${board[2]} == $IS_EMPTY ]]
    then
       board[2]=$computerLetter
-      play=1
+      Play=1
       return
   fi
 }
@@ -333,6 +337,55 @@ function takeCenter()
 		Play=1
 	fi
 }
+#Function to take any one side
+function takeSides()
+{
+	local letter=$1
+   Play=0
+   randomSides=$((RANDOM%4))
+   case $randomSides in
+	0)
+   	if [[ ${board[1]} == $IS_EMPTY ]]
+   	then
+			board[1]=$letter
+			Play=1
+   	   return
+   	else
+			takeSides $letter
+		fi
+   	;;
+	1)
+		if [[ ${board[3]} == $IS_EMPTY ]]
+		then
+			board[3]=$letter
+			Play=1
+			return
+		else
+			takesSides $letter
+		fi 
+		;;
+	2)
+		if [[ ${board[5]} == $IS_EMPTY ]]
+		then
+			board[5]=$letter
+			Play=1
+			return
+		else
+			takeSides $letter
+		fi 
+		;;
+	3)
+		if [[ ${display[7]} == $IS_EMPTY ]]
+		then
+			board[7]=$letter
+			Play=1
+			return
+		else
+			takeSides $letter
+		fi
+		;; 
+   esac
+}
 #Computer turn
 function computerTurn()
 {
@@ -351,19 +404,15 @@ function computerTurn()
 	fi
 	if(($Play==0))
 	then
-		data=$((RANDOM%9))
-		#If no value is assign to the index then go ahead else return function
-		if [ "${board[$data]}" != X ] && [ "${board[$data]}" != O ]
-		then
-			echo "Computer turn: "
-			board[$data]="$computerLetter"
-	else
-			computerTurn $computerLetter
-		fi
+		takeCenter $computerLetter
+	fi
+	if(($Play==0))
+	then
+		takeSides $computerLetter
 	fi
 	resultingBoard
 }
-#Function to play the both player alternatively
+#Function to play both the player alternatively
 function alternatePlay()
 {
 	chance="$(whoPlayFirst)"
@@ -383,9 +432,9 @@ function alternatePlay()
 				printf " Computer $result\n"
 				break 
 			fi
-		else
-			playerTurn $playerLetter
-			result="$(checkWin $playerLetter)"
+			else
+				playerTurn $playerLetter
+				result="$(checkWin $playerLetter)"
 			if [[ $result = "win" ]] || [[ $result = "draw" ]]
 			then
 				printf " Player $result\n"
@@ -398,4 +447,3 @@ function alternatePlay()
 resultingBoard
 getLetter
 alternatePlay
-

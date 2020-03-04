@@ -322,6 +322,17 @@ function fillCorners()
 	fi 
 	esac
 }
+#Take a centre
+function takeCenter()
+{
+	computerLetter=$1
+	Play=0
+	if [[ ${board[4]} == $IS_EMPTY ]]
+	then
+		board[4]=$computerLetter
+		Play=1
+	fi
+}
 #Computer turn
 function computerTurn()
 {
@@ -387,3 +398,4 @@ function alternatePlay()
 resultingBoard
 getLetter
 alternatePlay
+

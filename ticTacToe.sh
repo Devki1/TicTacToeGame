@@ -240,7 +240,132 @@ function alternatePlay()
 		flag=$((flag+1))
 	done
 }
+function blockPlayerWin()
+{
+	play=0
+	letter=$1
+	computerLetter=$2
+	index=0
+	while(($index<8))
+	do
+		#Checking for rows
+		if [[ ${board[$index]} == $letter && ${board[$((index+1))]} == $letter && ${board[$((index+2))]} == $IS_EMPTY ]]
+		then
+			board[$((index+2))]=$computerLetter
+			play=1
+			return
+		elif [[ ${board[$index]} == $letter && ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $IS_EMPTY ]]
+		then
+			board[$((index+1))]=$computerLetter
+			play=1
+			return
+		elif [[ ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
+		then
+			board[$index]=$computerLetter
+			playlay=1
+			return
+		fi
+		index=0
+		#Checking for columns
+		while(($index<8))
+		do
+			if [[ ${board[$index]} == $letter && ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $IS_EMPTY ]]
+		then
+			board[$((index+6))]=$computerLetter
+			play=1
+			return
+		elif [[ ${board[$index]} == $letter && ${board[$((index+6))]} == $letter && ${board[$((index+3))]} == $IS_EMPTY ]]
+		then
+			board[$((index+3))]=$computerLetter
+			play=1
+			return
+		elif [[ ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
+		then
+			board[$index]=$computerLetter
+			play=1
+			return
+		fi
+		index=$((index+3))
+	done
+   #Checking for primary diaganol
+	if [[ ${board[0]} == $letter && ${board[4]} == $letter && ${board[8]} == $IS_EMPTY ]]
+	then
+		board[8]=$computerLetter
+		play=1
+		return
+	elif [[ ${board[0]} == $letter && ${board[8]} == $letter && ${board[4]} == $IS_EMPTY ]]
+	then
+		board[4]=$computerLetter
+		play=1
+		return
+	elif [[ ${board[8]} == $letter && ${board[4]} == $letter && ${board[0]} == $IS_EMPTY ]]
+	then
+		board[0]=$computerLetter
+		play=1
+		return
+	fi
+}
+#Computer win randomly play on its turn
+function computerTurn()
+{
+	computerLetter=$1
+	playerLetter=$2
+	play=0
+	checkWiningMove $computerLetter
+	if(($play==0))
+	then
+		blockPlayerWin $playerLetter $computerLetter
+	fi
+	if(($play==0))
+	then
+		read data
+		#if no value is assign to the index then go ahead else return function
+		if [ "${board[$data]}" != X ] && [ "${board[$data]}" != O ]
+		then
+			echo "Computer turn: "
+			board[$data]="$computerLetter"
+		else
+			computerTurn $computerLetter
+		fi
+	fi
+	resultingBoard
+}
+#function play  both the player alternatvely
+function alternatePlay()
+{
+	chance="$(firstChance)"
+	flag=0
+	if [ "$chance" = "computerChance" ]
+	then
+		flag=1
+	fi
+	while ((0==0 ))
+	do
+		if(( flag%2!=0 ))
+		then
+			computerTurn $computerLetter $playerLetter
+			result=$(checkWin $computerLetter)
+			if [[ $result = "win" ]] || [[ $result = "draw" ]]
+			then
+				printf " Computer $result\n"
+				break 
+			fi
+		else
+			playerTurn $playerLetter
+			result="$(checkWin $playerLetter)"
+			if [[ $result = "win" ]] || [[ $result = "draw" ]]
+			result="$(checkWin $playerLetter)"
+			if [[ $result = "win" ]] || [[ $result = "draw" ]]
+			then
+				printf " Player $result\n"
+				break 
+			fi
+		fi
+		flag=$((flag+1))
+	done
+}
 resultingBoard
 getLetter
 alternatePlay
+
 

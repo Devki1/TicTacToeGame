@@ -7,6 +7,9 @@ CROSS=1
 USER=0
 COMPUTER=1
 IS_EMPTY=" "
+#Variables
+computerLetter=""
+playerLetter=""
 function resultingBoard()
 {
 	echo "${board[0]} | ${board[1]} | ${board[2]}"
@@ -84,15 +87,14 @@ function getLetter()
 	checkLetter=$((RANDOM%2))
 	case $checkLetter in
 		$DOT)
-			playerLetter="O"
-			computerLetter="X"
+			playerLetter=O
+			computerLetter=X
 			;;
 		$CROSS)
-			playerLetter="X"
-			computerLetter="O"
+			playerLetter=X
+			computerLetter=O
 			;;
 	esac
-#echo "Player: $playerLetter Computer: $computerLetter"
 }
 #Player chance
 function whoPlayFirst()
@@ -100,10 +102,10 @@ function whoPlayFirst()
 	playerChance=$((RANDOM%2))
 	case $playerChance in
 		$USER)
-			echo "User"
+			echo "playerChance"
 			;;
 		$COMPUTER)
-			echo "Computer"
+			echo "ComputerChance"
 			;;
 	esac
 }
@@ -189,57 +191,6 @@ function checkWiningMove()
 	return
 	fi
 }
-#Computer win randomly play on its turn
-function computerTurn()
-{
-	computerLetter=$1
-	play=0
-	checkWiningMove $computerLetter
-	if(($play==0))
-	then
-	data=$((RANDOM%9))
-	#if no value is assign to index then go ahead else return function
-   if [ "${board[$data]}" != X ] && [ "${board[$data]}" != O ]
-	then
-		echo "Computer turn: "
-		board[$data]="$computerLetter"
-		else
-			computerTurn $computerLetter
-	fi
-	fi
-	resultingBoard
-}
-function alternatePlay()
-{
-	chance="$(whoPlayFirst)"
-	flag=0
-	if [ "$chance" = "computerChance" ]
-	then
-		flag=1
-	fi
-	while ((0==0 ))
-	do
-		if(( flag%2!=0 ))
-		then
-			computerTurn $computerLetter
-			result=$(checkWin $computerLetter)
-		if [[ $result = "win" ]] || [[ $result = "draw" ]]
-		then
-			printf " Computer $result\n"
- 	        break 
-		fi
-		else
-			playerTurn $playerLetter
-			result="$(checkWin $playerLetter)"
-		if [[ $result = "win" ]] || [[ $result = "draw" ]]
-		then
-			printf " Player $result\n"
-				break 
-		fi
-		fi
-		flag=$((flag+1))
-	done
-}
 function blockPlayerWin()
 {
 	play=0
@@ -265,28 +216,29 @@ function blockPlayerWin()
 			playlay=1
 			return
 		fi
+	done
 		index=0
 		#Checking for columns
 		while(($index<8))
 		do
 			if [[ ${board[$index]} == $letter && ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $IS_EMPTY ]]
-		then
-			board[$((index+6))]=$computerLetter
-			play=1
+			then
+				board[$((index+6))]=$computerLetter
+				play=1
+				return
+			elif [[ ${board[$index]} == $letter && ${board[$((index+6))]} == $letter && ${board[$((index+3))]} == $IS_EMPTY ]]
+			then
+				board[$((index+3))]=$computerLetter
+				play=1
 			return
-		elif [[ ${board[$index]} == $letter && ${board[$((index+6))]} == $letter && ${board[$((index+3))]} == $IS_EMPTY ]]
-		then
-			board[$((index+3))]=$computerLetter
-			play=1
+			elif [[ ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
+			then
+				board[$index]=$computerLetter
+				play=1
 			return
-		elif [[ ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
-		then
-			board[$index]=$computerLetter
-			play=1
-			return
-		fi
-		index=$((index+3))
-	done
+			fi
+			index=$((index+3))
+		done
    #Checking for primary diaganol
 	if [[ ${board[0]} == $letter && ${board[4]} == $letter && ${board[8]} == $IS_EMPTY ]]
 	then
@@ -304,36 +256,107 @@ function blockPlayerWin()
 		play=1
 		return
 	fi
+	#checking for secondary diagonal
+	if [[ ${board[2]} == $letter && ${board[4]} == $letter && ${board[6]} == $IS_EMPTY ]]
+   then
+      board[6]=$computerLetter
+      play=1
+      return
+   elif [[ ${board[2]} == $letter && ${board[6]} == $letter && ${board[4]} == $IS_EMPTY ]]
+   then
+      board[4]=$computerLetter
+      play=1
+      return
+   elif [[ ${board[6]} == $letter && ${board[4]} == $letter && ${board[2]} == $IS_EMPTY ]]
+   then
+      board[2]=$computerLetter
+      play=1
+      return
+   fi
+
 }
-#Computer win randomly play on its turn
+#Filling corners randomly
+function fillCorners()
+{
+	local letter=$1
+	Play=0
+	randomCorner=$((RANDOM%4))
+	case $randomCorner in
+	0)
+	if [[ ${board[0]} == $IS_EMPTY ]]
+	then
+		board[0]=$computerLetter
+		Play=1
+		return
+	else
+		fillCorners $letter
+	fi
+	;;
+	1)
+	if [[ ${board[2]} == $IS_EMPTY ]]
+	then
+		board[2]=$computerLetter
+		Play=1
+		return
+	else
+		fillCorners $letter
+	fi 
+	;;
+	2)
+	if [[ ${board[6]} == $IS_EMPTY ]]
+	then
+		board[6]=$computerLetter
+		Play=1
+		return
+	else
+		fillCorners $letter
+	fi 
+	;;
+	3)
+	if [[ ${board[8]} == $IS_EMPTY ]]
+	then
+		board[2]=$computerLetter
+		Play=1
+		return
+	else
+		fillCorners $letter
+	fi 
+	esac
+}
+#Computer turn
 function computerTurn()
 {
 	computerLetter=$1
 	playerLetter=$2
-	play=0
+	Play=0
+	echo "Computer turn: "
 	checkWiningMove $computerLetter
-	if(($play==0))
+	if(($Play==0))
 	then
 		blockPlayerWin $playerLetter $computerLetter
 	fi
-	if(($play==0))
+	if(($Play==0))
 	then
-		read data
-		#if no value is assign to the index then go ahead else return function
+		fillCorners $computerLetter
+	fi
+	if(($Play==0))
+	then
+		data=$((RANDOM%9))
+		#If no value is assign to the index then go ahead else return function
 		if [ "${board[$data]}" != X ] && [ "${board[$data]}" != O ]
 		then
 			echo "Computer turn: "
 			board[$data]="$computerLetter"
-		else
+	else
 			computerTurn $computerLetter
 		fi
 	fi
 	resultingBoard
 }
-#function play  both the player alternatvely
+#Function to play the both player alternatively
 function alternatePlay()
 {
-	chance="$(firstChance)"
+	chance="$(whoPlayFirst)"
 	flag=0
 	if [ "$chance" = "computerChance" ]
 	then
@@ -354,8 +377,6 @@ function alternatePlay()
 			playerTurn $playerLetter
 			result="$(checkWin $playerLetter)"
 			if [[ $result = "win" ]] || [[ $result = "draw" ]]
-			result="$(checkWin $playerLetter)"
-			if [[ $result = "win" ]] || [[ $result = "draw" ]]
 			then
 				printf " Player $result\n"
 				break 
@@ -367,5 +388,3 @@ function alternatePlay()
 resultingBoard
 getLetter
 alternatePlay
-
-

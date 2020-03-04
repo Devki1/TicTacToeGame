@@ -65,9 +65,9 @@ function checkWin()
 		result="win"
 	else
 		flag=0
-		for((count=0;count<${#board[@]};count++))
+		for((index=0;index<${#board[@]};index++))
 		do
-			if [ "${board[$count]}" != "X" ] && [ "${board[$count]}" != "O" ]
+			if [ "${board[$index]}" != "X" ] && [ "${board[$index]}" != "O" ]
 			then
 				flag=1
 			fi
@@ -272,8 +272,7 @@ function blockPlayerWin()
       board[2]=$computerLetter
       play=1
       return
-   fi
-
+  fi
 }
 #Filling corners randomly
 function fillCorners()

@@ -114,17 +114,17 @@ function checkWiningMove()
 	#Checking for rows
 	while(($index<8))
 	do
-		if [[ ${display[$index]} == $letter && ${display[$((index+1))]} == $letter && ${display[$((index+2))]} == $IS_EMPTY ]]
+		if [[ ${board[$index]} == $letter && ${board[$((index+1))]} == $letter && ${board[$((index+2))]} == $IS_EMPTY ]]
 		then
 			board[$((index+2))]=$letter
 			play=1
 		return
-		elif [[ ${display[$index]} == $letter && ${display[$((index+2))]} == $letter && ${display[$((index+1))]} == $IS_EMPTY ]]
+		elif [[ ${board[$index]} == $letter && ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $IS_EMPTY ]]
 		then
 			board[$((index+1))]=$letter
 			play=1
 		return
-		elif [[ ${display[$((index+2))]} == $letter && ${display[$((index+1))]} == $letter && ${display[$index]} == $IS_EMPTY ]]
+		elif [[ ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
 		then
 			board[$index]=$letter
 			play=1

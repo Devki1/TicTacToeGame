@@ -375,7 +375,7 @@ function takeSides()
 		fi 
 		;;
 	3)
-		if [[ ${display[7]} == $IS_EMPTY ]]
+		if [[ ${board[7]} == $IS_EMPTY ]]
 		then
 			board[7]=$letter
 			Play=1

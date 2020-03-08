@@ -1,5 +1,4 @@
 #!/bin/bash -x
-printf "Welcome to Tic Tac Toe Game"
 #Constant
 DOT=0
 CROSS=1
@@ -266,15 +265,15 @@ function takeSides()
    randomSides=$((RANDOM%4))
    case $randomSides in
 	0)
-   	if [[ ${board[1]} == $IS_EMPTY ]]
-   	then
+		if [[ ${board[1]} == $IS_EMPTY ]]
+		then
 			board[1]=$letter
 			play=1
-   	   return
-   	else
+			return
+		else
 			takeSides $letter
 		fi
-   ;;
+	;;
 	1)
 		if [[ ${board[3]} == $IS_EMPTY ]]
 		then
